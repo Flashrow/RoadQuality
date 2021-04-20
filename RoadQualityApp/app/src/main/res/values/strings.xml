@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">RoadQuality</string>
+    <string name="bumpBtnText">Próg</string>
+    <string name="oddsBtnText">Nierówność</string>
+    <string name="holeBtnText">Dziura</string>
+    <string name="btnStartText">Start</string>
+    <string name="btnStopText">Stop</string>
 </resources>
