@@ -1,11 +1,18 @@
-package pl.polsl.roadquality
+package pl.polsl.roadquality.Activity
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import org.w3c.dom.Text
-import pl.polsl.roadqualit.AccelerometerManager
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.OnSuccessListener
+import pl.polsl.roadquality.DataProviders.SensorManager
+import pl.polsl.roadquality.R
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var gpsPositionLabel : TextView
     lateinit var timeLabel : TextView
 
-    val accelerometerManager : AccelerometerManager = AccelerometerManager(this)
+    private lateinit var sensorManager : SensorManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +48,19 @@ class MainActivity : AppCompatActivity() {
         gpsPositionLabel = findViewById(R.id.gpsLabel)
         timeLabel = findViewById(R.id.timeLabel)
 
-        accelerometerManager.initializeManager()
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            println("Location Service - no permission for access fine location")
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),1)
+            return
+        }
+        sensorManager = SensorManager(this)
+        sensorManager.initializeManager()
     }
 }
