@@ -6,8 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProviders
 import pl.polsl.roadquality.DataHarvester
 import pl.polsl.roadquality.DataProviders.SensorManager
+import pl.polsl.roadquality.MainViewModel
 import pl.polsl.roadquality.R
 
 class MainActivity : AppCompatActivity() {
@@ -32,8 +34,27 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         bindViews()
 
+        /*
+        val mainViewModel = ViewModelProviders.of(this)
+            .get(MainViewModel::class.java)
+
+        DataBindingUtil.setContentView<ActivityMainBinding>(
+            this, R.layout.activity_main
+        ).apply {
+            this.lifecycleOwner = this@MainActivity
+            this.viewmodel = mainViewModel
+        }
+
+        mainViewModel.currentTime.observe(this, Observer {
+            Toast.makeText(this, it, Toast.LENGTH_LONG)
+        })
+*/
         sensorManager = SensorManager(this)
         sensorManager.initializeManager()
+    }
+
+    private fun requestInternetConnectionPermission(){
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

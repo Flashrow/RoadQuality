@@ -25,11 +25,13 @@ class SensorManager(private val context: Context) : SensorEventListener{
     private lateinit var locationProvider : GpsLocationProvider
 
 
-    public var ax : Double = 0.0
-    public var ay : Double = 0.0
-    public var az : Double = 0.0
+    private var ax : Double = 0.0
+    private var ay : Double = 0.0
+    private var az : Double = 0.0
 
-
+    private var gx : Double = 0.0
+    private var gy : Double = 0.0
+    private var gz : Double = 0.0
 
     public fun initializeManager(){
         locationProvider = GpsLocationProvider(context, dataHarvester)
@@ -56,11 +58,11 @@ class SensorManager(private val context: Context) : SensorEventListener{
             //println("Accelerometer reading, x:$ax, y:$ay, az:$az");
 
         } else if(event?.sensor?.type ==Sensor.TYPE_GYROSCOPE) {
-            var gyrosX = event?.values[0].toDouble()
-            var gyrosY = event?.values[1].toDouble()
-            var gyrosZ = event?.values[2].toDouble()
+            gx = event?.values[0].toDouble()
+            gy = event?.values[1].toDouble()
+            gz = event?.values[2].toDouble()
 
-            gyrosData = GyroscopeData(gyrosX, gyrosY, gyrosZ)
+            gyrosData = GyroscopeData(gx, gy, gz)
             accData = AccelerometerData(0.0, 0.0, 0.0)
 
             dataHarvester.addGyroscopeData(gyrosData)

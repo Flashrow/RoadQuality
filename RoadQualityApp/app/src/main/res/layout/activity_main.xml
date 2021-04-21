@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout>
+    <data>
+        <variable
+            name="viewmodel"
+            type="pl.polsl.roadquality.MainViewModel"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -19,10 +26,10 @@
 
     <TextView
         android:id="@+id/timeLabel"
+        android:text="@{viewmodel.currentTime}"
         android:layout_width="5dp"
         android:layout_height="12dp"
         android:layout_marginTop="68dp"
-        android:text="0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +51,7 @@
         android:layout_width="7dp"
         android:layout_height="13dp"
         android:layout_marginTop="32dp"
-        android:text="0"
+        android:text="@{viewmodel.currentPosition}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,13 +79,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="0" />
+            android:text="@{viewmodel.accelerometerXaxis}" />
 
         <TextView
             android:id="@+id/yAxisTextLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_marginStart="30dp"
             android:layout_weight="1"
             android:text="y:" />
@@ -88,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="0" />
+            android:text="@{viewmodel.accelerometerYaxis}" />
 
         <TextView
             android:id="@+id/zAxisTextLabel"
@@ -103,7 +109,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="0" />
+            android:text="@{viewmodel.accelerometerZaxis}" />
     </LinearLayout>
 
     <TextView
@@ -121,7 +127,7 @@
         android:id="@+id/accVecLengthLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text="@{viewmodel.accelerometerVecLenght}"
         app:layout_constraintBottom_toTopOf="@+id/reportDamageLabel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -153,6 +159,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:onClick="@{() -> viewmodel.onBumpClick()}"
             android:text="@string/bumpBtnText" />
 
         <Button
@@ -160,7 +167,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-
+            android:onClick="@{() -> viewmodel.onOddsClick()}"
             android:text="@string/oddsBtnText" />
 
         <Button
@@ -168,6 +175,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:onClick="@{() -> viewmodel.onHoleClick()}"
             android:text="@string/holeBtnText" />
     </LinearLayout>
 
@@ -188,6 +196,7 @@
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="@{() -> viewmodel.onStartClick()}"
             android:text="@string/btnStartText" />
 
         <Button
@@ -195,7 +204,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="100dp"
+            android:onClick="@{() -> viewmodel.onStopClick()}"
             android:text="@string/btnStopText" />
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
