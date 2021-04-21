@@ -1,15 +1,10 @@
 package pl.polsl.roadquality.DataProviders
 
-import android.Manifest
-import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
-import android.content.Context.LOCATION_SERVICE
-import android.content.pm.PackageManager
-import android.location.Criteria
+import android.content.Intent
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import androidx.core.app.ActivityCompat
+import mumayank.com.airlocationlibrary.AirLocation
 
 
 class GpsLocationProvider(private val context: Context){
@@ -18,26 +13,33 @@ class GpsLocationProvider(private val context: Context){
     private var speed : Double = 0.0
 
     private var previousLocation : Location? = null
+    private val mainActivity : Activity = context as Activity
 
-    private lateinit var locationManager : LocationManager
-    var provider : String = ""
-    var criteria: Criteria? = null
-    private lateinit var locationListener : LocationListener
+    private val airLocation = AirLocation(mainActivity, object : AirLocation.Callback {
 
-    @SuppressLint("MissingPermission")
-    fun initializeLocationService(){
-        println("Location listener - creating location listener")
-        locationListener = LocationListener() {
-            fun onLocationChanged(location: Location) {
-                println("Location Listener: $location")
-            }
-
-            fun onProviderDisabled(provider : String){
-                println("Location Listener - provider disabled")
-            }
+        override fun onSuccess(locations: ArrayList<Location>) {
+            // do something
+            // the entire track is sent in locations
+            println("""Location Provider, last location: ${locations.last()}""")
         }
 
-        locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0f, locationListener)
+        override fun onFailure(locationFailedEnum: AirLocation.LocationFailedEnum) {
+            // do something
+            // the reason for failure is given in locationFailedEnum
+            println("Location Provider, failure: $locationFailedEnum")
+        }
+
+    })
+
+    public fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray){
+        airLocation.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    public fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
+        airLocation.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun initializeLocationService(){
+        airLocation.start()
     }
 }

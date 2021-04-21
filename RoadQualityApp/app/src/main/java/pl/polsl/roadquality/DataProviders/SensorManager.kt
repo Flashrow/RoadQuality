@@ -2,6 +2,7 @@ package pl.polsl.roadquality.DataProviders
 
 import android.content.Context
 import android.content.Context.SENSOR_SERVICE
+import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -16,10 +17,11 @@ class SensorManager(private val context: Context) : SensorEventListener{
     private lateinit var mAccelerometer: Sensor
     private lateinit var mGyroscope: Sensor
 
-    private val dataHarvester : DataHarvester = DataHarvester(context)
+    private val dataHarvester : DataHarvester = DataHarvester()
 
     private lateinit var accData: AccelerometerData
     private lateinit var gyrosData: GyroscopeData
+    private lateinit var locationProvider : GpsLocationProvider
 
     public var ax : Double = 0.0
     public var ay : Double = 0.0
@@ -28,6 +30,9 @@ class SensorManager(private val context: Context) : SensorEventListener{
 
 
     public fun initializeManager(){
+        locationProvider = GpsLocationProvider(context)
+        locationProvider.initializeLocationService()
+
         sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
         mAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -44,7 +49,7 @@ class SensorManager(private val context: Context) : SensorEventListener{
             accData = AccelerometerData(ax, ay, az)
             gyrosData = GyroscopeData(0.0,0.0,0.0)
 
-            println("Accelerometer reading, x:$ax, y:$ay, az:$az");
+            //println("Accelerometer reading, x:$ax, y:$ay, az:$az");
 
         } else if(event?.sensor?.type ==Sensor.TYPE_GYROSCOPE) {
             var gyrosX = event?.values[0].toDouble()
@@ -54,10 +59,16 @@ class SensorManager(private val context: Context) : SensorEventListener{
             gyrosData = GyroscopeData(gyrosX, gyrosY, gyrosZ)
             accData = AccelerometerData(0.0, 0.0, 0.0)
 
-            println("Gyroscope reading, x:$gyrosX, y:$gyrosY, az:$gyrosZ");
+            //println("Gyroscope reading, x:$gyrosX, y:$gyrosY, az:$gyrosZ");
         }
+    }
 
+    public fun requestResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray){
+        locationProvider.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 
+    public fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
+        locationProvider.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
