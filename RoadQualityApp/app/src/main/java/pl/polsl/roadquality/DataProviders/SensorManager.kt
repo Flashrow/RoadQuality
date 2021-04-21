@@ -13,12 +13,10 @@ import pl.polsl.roadquality.DataContainers.GyroscopeData
 import pl.polsl.roadquality.DataHarvester
 
 
-class SensorManager(private val context: Context) : SensorEventListener{
+class SensorManager(private val context: Context, private val dataHarvester : DataHarvester) : SensorEventListener{
     private lateinit var sensorManager: SensorManager
     private lateinit var mAccelerometer: Sensor
     private lateinit var mGyroscope: Sensor
-
-    private val dataHarvester : DataHarvester = DataHarvester(context)
 
     private lateinit var accData: AccelerometerData
     private lateinit var gyrosData: GyroscopeData

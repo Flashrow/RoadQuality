@@ -6,11 +6,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProviders
+//import androidx.lifecycle.ViewModelProviders
 import pl.polsl.roadquality.DataHarvester
 import pl.polsl.roadquality.DataProviders.SensorManager
 import pl.polsl.roadquality.MainViewModel
 import pl.polsl.roadquality.R
+import pl.polsl.roadquality.RoadFailure
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var timeLabel : TextView
 
     private lateinit var sensorManager : SensorManager
+    private lateinit var dataHarvester : DataHarvester
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +55,55 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.currentTime.observe(this, Observer {
             Toast.makeText(this, it, Toast.LENGTH_LONG)
         })
+
 */
-        sensorManager = SensorManager(this)
+        btnStop.isEnabled = false
+        btnStop.isClickable = false
+
+        dataHarvester = DataHarvester(this)
+
+        btnStart.setOnClickListener {
+            dataHarvester.fileId = generateFileId()
+            dataHarvester.isRunning = true
+            btnStart.isEnabled = false
+            btnStart.isClickable = false
+            btnStop.isEnabled = true
+            btnStop.isClickable = true
+        }
+
+        btnStop.setOnClickListener {
+            dataHarvester.isRunning = false
+            btnStop.isEnabled = false
+            btnStop.isClickable = false
+            btnStart.isEnabled = true
+            btnStart.isClickable = true
+        }
+
+        btnBump.setOnClickListener {
+            dataHarvester.roadFailure = RoadFailure.BUMP
+        }
+
+        btnHole.setOnClickListener {
+            dataHarvester.roadFailure = RoadFailure.HOLE
+        }
+
+        btnOdds.setOnClickListener {
+            dataHarvester.roadFailure = RoadFailure.ODDS
+        }
+
+        sensorManager = SensorManager(this, dataHarvester)
         sensorManager.initializeManager()
     }
 
     private fun requestInternetConnectionPermission(){
 
+    }
+
+    fun generateFileId(): String {
+        var date = LocalDateTime.now()
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
+        var formattedDate = date.format(formatter)
+        return "$formattedDate"
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

@@ -21,21 +21,28 @@ class DataHarvester(private val context: Context){
     var accDataList: MutableList<AccelerometerData> = mutableListOf()
     var gyroscopeDataList: MutableList<GyroscopeData> = mutableListOf()
 
+    var isRunning: Boolean = false
+    var roadFailure: RoadFailure? = null
+    var fileId: String = ""
+
     private val mainActivity: Activity = context as Activity
 
     val queue = Volley.newRequestQueue(mainActivity)
 
     public fun addGyroscopeData(data: GyroscopeData) {
+        if(!isRunning) return
         gyroscopeDataList.add(data)
         newGyroscopeDataAdded()
     }
 
     public fun addAccData(data: AccelerometerData) {
+        if(!isRunning) return
         accDataList.add(data)
         newAccDataAdded()
     }
 
     public fun addGpsData(data: GpsLocationData) {
+        if(!isRunning) return
         gpsDataList.add(data)
     }
 
@@ -78,6 +85,11 @@ class DataHarvester(private val context: Context){
     private fun checkData(){
         if(rows.isNullOrEmpty() || rows.size < 2)
             return
+
+        if(roadFailure != null) {
+            rows.last().roadFailure = roadFailure
+            roadFailure = null
+        }
         //println("DataHarvester, now: " + System.currentTimeMillis() + ", last: " + rows.first().time + ", difference: " + (System.currentTimeMillis() - rows.first().time))
         if(System.currentTimeMillis() - rows.first().time > 5000 )
             sendData()
@@ -85,7 +97,7 @@ class DataHarvester(private val context: Context){
 
     private fun sendData(){
         println("DataHarvester, sending data...")
-        val fileName: String = "FirstData"
+        val fileName: String = fileId
         var csvBody: String = ""
         var json = ""
 
@@ -94,6 +106,7 @@ class DataHarvester(private val context: Context){
             csvBody += "${row.gpsLocation?.latitude};${row.gpsLocation?.longitude};${row.gpsLocation?.speed};"
             csvBody += "${row.gyroscope?.x};${row.gyroscope?.y};${row.gyroscope?.z};"
             csvBody += "${row.sensorData?.x};${row.sensorData?.y};${row.sensorData?.z};"
+            csvBody += "${row.roadFailure};"
             csvBody += "${row.time};\\n"
         }
         println("Rows $rows")
