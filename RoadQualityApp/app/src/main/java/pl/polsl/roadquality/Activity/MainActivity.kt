@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import mumayank.com.airlocationlibrary.AirLocation
+import pl.polsl.roadquality.DataHarvester
 import pl.polsl.roadquality.DataProviders.SensorManager
 import pl.polsl.roadquality.R
 

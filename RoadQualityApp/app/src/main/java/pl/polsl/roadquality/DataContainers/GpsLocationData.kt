@@ -5,6 +5,6 @@ import java.util.*
 data class GpsLocationData(
         val latitude : Double,
         val longitude : Double,
-        val speed : Double){
-    var time : Date = Date()
+        val speed : Float){
+    var time : Long = System.currentTimeMillis()
 }

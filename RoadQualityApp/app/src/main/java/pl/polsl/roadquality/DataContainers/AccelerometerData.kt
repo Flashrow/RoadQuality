@@ -6,7 +6,7 @@ data class AccelerometerData (
         val x : Double,
         val y : Double,
         val z : Double){
-    var time : Date = Date()
+    var time : Long = System.currentTimeMillis()
 }
 
 enum class RoadFailure {HOLE, BUMP, ODDS}

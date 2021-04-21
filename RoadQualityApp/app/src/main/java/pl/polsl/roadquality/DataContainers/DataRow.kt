@@ -5,10 +5,10 @@ import pl.polsl.roadquality.RoadFailure
 import java.util.*
 
 data class DataRow(
-    val sensorData: AccelerometerData,
-    val roadFailure: RoadFailure,
-    val gpsLocation : GpsLocationData,
-    val gyroscope : GyroscopeData
+    var sensorData: AccelerometerData?,
+    var roadFailure: RoadFailure?,
+    var gpsLocation : GpsLocationData?,
+    var gyroscope : GyroscopeData?
         ){
-    var time : Date = Date()
+    var time : Long = System.currentTimeMillis()
 }

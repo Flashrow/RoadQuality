@@ -8,6 +8,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import pl.polsl.roadquality.AccelerometerData
+import pl.polsl.roadquality.DataContainers.GpsLocationData
 import pl.polsl.roadquality.DataContainers.GyroscopeData
 import pl.polsl.roadquality.DataHarvester
 
@@ -17,11 +18,12 @@ class SensorManager(private val context: Context) : SensorEventListener{
     private lateinit var mAccelerometer: Sensor
     private lateinit var mGyroscope: Sensor
 
-    private val dataHarvester : DataHarvester = DataHarvester()
+    private val dataHarvester : DataHarvester = DataHarvester(context)
 
     private lateinit var accData: AccelerometerData
     private lateinit var gyrosData: GyroscopeData
     private lateinit var locationProvider : GpsLocationProvider
+
 
     public var ax : Double = 0.0
     public var ay : Double = 0.0
@@ -30,7 +32,7 @@ class SensorManager(private val context: Context) : SensorEventListener{
 
 
     public fun initializeManager(){
-        locationProvider = GpsLocationProvider(context)
+        locationProvider = GpsLocationProvider(context, dataHarvester)
         locationProvider.initializeLocationService()
 
         sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
@@ -49,6 +51,8 @@ class SensorManager(private val context: Context) : SensorEventListener{
             accData = AccelerometerData(ax, ay, az)
             gyrosData = GyroscopeData(0.0,0.0,0.0)
 
+            dataHarvester.addAccData(accData)
+
             //println("Accelerometer reading, x:$ax, y:$ay, az:$az");
 
         } else if(event?.sensor?.type ==Sensor.TYPE_GYROSCOPE) {
@@ -58,6 +62,8 @@ class SensorManager(private val context: Context) : SensorEventListener{
 
             gyrosData = GyroscopeData(gyrosX, gyrosY, gyrosZ)
             accData = AccelerometerData(0.0, 0.0, 0.0)
+
+            dataHarvester.addGyroscopeData(gyrosData)
 
             //println("Gyroscope reading, x:$gyrosX, y:$gyrosY, az:$gyrosZ");
         }
