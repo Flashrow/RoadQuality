@@ -78,7 +78,7 @@ class SensorManager(private val context: Context, private val dataHarvester : Da
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
     }
 
 }

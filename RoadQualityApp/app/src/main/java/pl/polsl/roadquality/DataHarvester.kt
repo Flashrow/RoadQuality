@@ -21,6 +21,10 @@ class DataHarvester(private val context: Context){
     var accDataList: MutableList<AccelerometerData> = mutableListOf()
     var gyroscopeDataList: MutableList<GyroscopeData> = mutableListOf()
 
+    var gpsData: GpsLocationData = GpsLocationData(0.0,0.0,0f)
+    var accData: AccelerometerData = AccelerometerData(0.0,0.0,0.0)
+    var gyroscopeData: GyroscopeData = GyroscopeData(0.0,0.0,0.0)
+
     var isRunning: Boolean = false
     var roadFailure: RoadFailure? = null
     var fileId: String = ""
@@ -32,17 +36,20 @@ class DataHarvester(private val context: Context){
     public fun addGyroscopeData(data: GyroscopeData) {
         if(!isRunning) return
         gyroscopeDataList.add(data)
+        gyroscopeData = data
         newGyroscopeDataAdded()
     }
 
     public fun addAccData(data: AccelerometerData) {
         if(!isRunning) return
         accDataList.add(data)
+        accData = data
         newAccDataAdded()
     }
 
     public fun addGpsData(data: GpsLocationData) {
         if(!isRunning) return
+        gpsData = data
         gpsDataList.add(data)
     }
 
@@ -80,6 +87,11 @@ class DataHarvester(private val context: Context){
 
         rows.add(row)
         checkData()
+    }
+
+    public fun runRoadChecking(){
+        var row: DataRow = DataRow(null, null, null, null)
+
     }
 
     private fun checkData(){
