@@ -2,7 +2,9 @@ package pl.polsl.roadquality
 
 import android.app.Activity
 import android.content.Context
+import android.os.Environment
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
@@ -12,6 +14,8 @@ import org.json.JSONObject
 import pl.polsl.roadquality.DataContainers.DataRow
 import pl.polsl.roadquality.DataContainers.GpsLocationData
 import pl.polsl.roadquality.DataContainers.GyroscopeData
+import java.io.File
+import java.io.FileWriter
 
 
 class DataHarvester(private val context: Context){
@@ -28,6 +32,8 @@ class DataHarvester(private val context: Context){
     var isRunning: Boolean = false
     var roadFailure: RoadFailure? = null
     var fileId: String = ""
+
+
 
     private val mainActivity: Activity = context as Activity
 
@@ -103,8 +109,10 @@ class DataHarvester(private val context: Context){
             roadFailure = null
         }
         //println("DataHarvester, now: " + System.currentTimeMillis() + ", last: " + rows.first().time + ", difference: " + (System.currentTimeMillis() - rows.first().time))
-        if(System.currentTimeMillis() - rows.first().time > 5000 )
+        if(System.currentTimeMillis() - rows.first().time > 5000 ){
             sendData()
+        }
+
     }
 
     private fun sendData(){
@@ -112,19 +120,25 @@ class DataHarvester(private val context: Context){
         val fileName: String = fileId
         var csvBody: String = ""
         var json = ""
+        val localFileWriter: FileWriter = openLocalCsvFile()
 
-
+        openLocalCsvFile()
         for(row in rows) {
-            csvBody += "${row.gpsLocation?.latitude};${row.gpsLocation?.longitude};${row.gpsLocation?.speed};"
-            csvBody += "${row.gyroscope?.x};${row.gyroscope?.y};${row.gyroscope?.z};"
-            csvBody += "${row.sensorData?.x};${row.sensorData?.y};${row.sensorData?.z};"
-            csvBody += "${row.roadFailure};"
-            csvBody += "${row.time};\\n"
+            var line = "${row.gpsLocation?.latitude};${row.gpsLocation?.longitude};${row.gpsLocation?.speed};"
+            line += "${row.gyroscope?.x};${row.gyroscope?.y};${row.gyroscope?.z};"
+            line += "${row.sensorData?.x};${row.sensorData?.y};${row.sensorData?.z};"
+            line += "${row.roadFailure};"
+            line += "${row.time};"
+
+            localFileWriter.write(line)
+            localFileWriter.write(String.format("%n"))
+            
+            line += "\\n"
+            csvBody += line
         }
+        localFileWriter.close()
         println("Rows $rows")
-
         json = "{\"id\":\"$fileName\", \"data\":\"$csvBody\"}"
-
         var jsonObj : JSONObject = JSONObject()
 
         try {
@@ -135,7 +149,6 @@ class DataHarvester(private val context: Context){
         }
 
         val url = "http://roadquality.ddns.net/data"
-        
         println("DataHarvester, Creating POST request...")
         val req = JsonObjectRequest(Request.Method.POST, url, jsonObj,
             { response ->
@@ -146,7 +159,15 @@ class DataHarvester(private val context: Context){
             }
         )
         queue.add(req)
-
         rows.clear()
     }
+
+    public fun openLocalCsvFile() : FileWriter{
+        val externalStorageVolumes: Array<out File> =
+                ContextCompat.getExternalFilesDirs(context, null)
+        val primaryExternalStorage = externalStorageVolumes[0]
+        val csvDataFile = File(primaryExternalStorage,"$fileId.csv")
+        return FileWriter(csvDataFile, true)
+    }
+
 }
